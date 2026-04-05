@@ -1,0 +1,167 @@
+.bottomSheet {
+  position: fixed; /* 화면에 고정 */
+  bottom: 20px; /* 바닥에서 20px 띄움 */
+  left: 50%; /* 중앙 정렬 시작점 */
+  transform: translateX(-50%); /* 정확한 중앙 정렬 */
+  width: calc(100% - 40px); /* 좌우 20px씩 여백 확보 */
+  max-width: 500px; /* PC나 태블릿에서도 너무 길어지지 않게 제한 */
+  background: white;
+  border-radius: 20px; /* 위아래 모두 둥글게 처리 */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* 그림자 강화로 입체감 부여 */
+  z-index: 1000;
+  padding: 16px;
+  max-height: 60vh;
+  overflow-y: auto;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* 더 부드러운 애니메이션 */
+  scrollbar-width: none;
+}
+
+.bottomSheet::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translate(-50%, 120%); /* 중앙 유지하며 아래에서 올라옴 */
+  }
+  to { 
+    transform: translate(-50%, 0); 
+  }
+}
+
+.dragHandle {
+  width: 40px;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.badgeGroup { 
+  display: flex; 
+  gap: 8px; 
+  margin-bottom: 12px; 
+}
+
+.categoryBadge { 
+  background: #fce8e6; 
+  color: #d93025; 
+  padding: 4px 10px; 
+  border-radius: 6px; 
+  font-size: 12px; 
+  font-weight: bold; 
+}
+
+/* 시민 제보 배지 스타일 */
+.userBadge { 
+  background: #fff3cd; 
+  color: #856404; 
+  padding: 4px 10px; 
+  border-radius: 6px; 
+  font-size: 12px; 
+  font-weight: bold; 
+}
+
+/* 공공 데이터 배지 스타일 */
+.publicBadge { 
+  background: #e8f0fe; 
+  color: #1a73e8; 
+  padding: 4px 10px; 
+  border-radius: 6px; 
+  font-size: 12px; 
+  font-weight: bold; 
+}
+
+.title { 
+  font-size: 1.2rem; 
+  margin: 8px 0; 
+  font-weight: 700; 
+  color: #202124;
+}
+
+/* 사진 슬라이더 영역 조정 */
+.photoSlider { 
+  display: flex; 
+  gap: 12px; 
+  overflow-x: auto; 
+  margin: 16px 0;
+  padding-bottom: 4px; 
+  scrollbar-width: none;
+  justify-content: center;
+}
+
+.photoSlider::-webkit-scrollbar {
+  display: none;
+}
+
+.hazardImage { 
+  width: 160px; 
+  height: 120px; 
+  object-fit: cover; 
+  border-radius: 12px; 
+  flex-shrink: 0; 
+  background-color: #f1f3f5;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.infoSection h3 { 
+  font-size: 14px; 
+  color: #5f6368; 
+  margin-bottom: 6px; 
+  font-weight: 600;
+}
+
+.description { 
+  font-size: 0.95rem; 
+  line-height: 1.6; 
+  color: #3c4043; 
+  margin-bottom: 8px;
+}
+
+.feedbackActions { 
+  display: flex; 
+  gap: 10px; 
+  margin-top: 24px; 
+}
+
+.agreeBtn, .disagreeBtn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.agreeBtn {
+  background: #1a73e8;
+  color: white;
+}
+
+.agreeBtn:hover {
+  background: #1765cc;
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+.disagreeBtn {
+  background: #f1f3f5;
+  color: #5f6368;
+}
+
+.disagreeBtn:hover {
+  background: #e8eaed;
+}

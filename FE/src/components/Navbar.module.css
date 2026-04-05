@@ -1,0 +1,82 @@
+.navbar {
+  position: absolute;
+  top: 15px; /* 조금 더 위로 붙임 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 580px;
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.navContent {
+  pointer-events: auto;
+  width: 100%;
+  background: white;
+  padding: 6px 14px;
+  border-radius: 50px; /* 완전한 캡슐 모양 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* 조금 더 진한 그림자로 강조 */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.searchForm {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.searchIcon {
+  font-size: 16px;
+  color: #999;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  padding: 8px 0;
+  background: transparent;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: #e0e0e0;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 5px;
+}
+
+.filterBtn {
+  border: none;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* 필터가 활성화되었을 때만 배경색 강조 */
+.filterBtn.active {
+  background: #f1f3f5;
+  color: #222;
+  font-weight: 700;
+}
+
+/* 모바일 전용: 화면이 작으면 검색창만 크게 보여줌 */
+@media (max-width: 500px) {
+  .filterBtn {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+}
