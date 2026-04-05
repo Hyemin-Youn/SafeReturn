@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, ChevronRight } from 'lucide-react';
-import userImg from '/FE/src/assets/user.png'; 
+import userImg from '../../../assets/user.png'; 
 
 const MyPage = () => {
   const navigate = useNavigate();
