@@ -58,10 +58,10 @@ export const useReportForm = (isOpen, pickedLocation) => {
     }
   };
 
-  const isFormValid = imageFile !== null && reportType !== "" && description.trim() !== "";
+  const isFormValid = reportTitle.trim() !== "" && imageFile !== null && reportType !== "" && description.trim() !== "";
 
   return {
     location, reportType, setReportType, description, setDescription,
-    imageFile, previewUrl, handleImageChange, isFormValid, resetForm
+    imageFile, previewUrl, handleImageChange, isFormValid, resetForm,reportTitle, setReportTitle
   };
 };

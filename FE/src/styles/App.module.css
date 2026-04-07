@@ -253,3 +253,36 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   font-size: 14px;
 }
+
+/* 기존 코드 하단에 추가 */
+
+.myPageFloatingBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  z-index: 500; /* 우하단 버튼들과 레벨을 맞춤 */
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.myPageFloatingBtn:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.05);
+}
+
+.myPageFloatingBtn:active {
+  transform: scale(0.95);
+}
+
+.myPageIcon {
+  font-size: 24px;
+}

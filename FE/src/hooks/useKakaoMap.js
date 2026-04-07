@@ -2,101 +2,91 @@ import { useEffect, useRef } from "react";
 import { useMapStore } from "../store/useMapStore";
 
 export const useKakaoMap = (isPicking) => {
-  const { map, setMap, hazards, activeFilters } = useMapStore();
-  const isInitialized = useRef(false);
+  const { map, setMap, hazards, activeFilters, setSelectedHazard } = useMapStore();
   const markersRef = useRef([]);
   const myLocationMarkerRef = useRef(null);
 
-  // 1. 지도 초기화 (최초 1회만 실행)
+  // 1. 지도 초기화 및 클린업 🚩 (이 부분이 수정되었습니다)
   useEffect(() => {
-    if (map || isInitialized.current) return;
     const container = document.getElementById("map");
-    if (!container) return;
+    // window.kakao가 없으면 중단하지만, map이 있는지는 여기서 체크하지 않습니다.
+    if (!container || !window.kakao) return;
 
     window.kakao.maps.load(() => {
+      // 🚩 중복 생성을 막으려면 container 내부를 비워주는 것이 안전합니다.
+      container.innerHTML = ''; 
+      
       const options = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+        center: new window.kakao.maps.LatLng(37.6602, 127.0540),
         level: 3,
       };
       const kakaoMap = new window.kakao.maps.Map(container, options);
-      isInitialized.current = true;
       setMap(kakaoMap);
     });
-  }, [map, setMap]);
 
-  // 2. 마커 렌더링 및 지능형 필터링
+    // 🚩 [핵심] 페이지를 나갈 때 스토어의 map 객체를 null로 초기화합니다.
+    // 그래야 다시 돌아왔을 때 '지도 없음' 상태가 되어 새로 그립니다.
+    return () => {
+      setMap(null);
+    };
+  }, [setMap]); // 의존성에서 map을 제거하여 처음 한 번만 실행되게 합니다.
+
+  // 2. 마커 렌더링 (동일)
   useEffect(() => {
-    if (!map || !hazards) return;
+    if (!map || !hazards || !Array.isArray(hazards)) return;
 
-    // 기존 마커 물리적으로 제거
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
 
-    // 제보 모드(좌표 찍기)일 때는 위험 요소 마커를 일시적으로 숨김
     if (isPicking) return;
 
-    // 카테고리 - 필터 키 매핑 (이것이 핵심!)
     const CATEGORY_MAP = {
-      CONSTRUCTION: "construction", // 공사현장
-      BROKEN_LIGHT: "broken_light", // 어두운길 (가로등 파손 포함)
+      CONSTRUCTION: "construction",
+      SMART_LIGHT: "broken_light",
+      ACCIDENT_ZONE: "etc",
     };
 
-    const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png"; 
-    const imageSize = new window.kakao.maps.Size(24, 35); 
-    const userMarkerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
+    const newMarkers = hazards
+      .filter((item) => {
+        const filterKey = CATEGORY_MAP[item.type] || "etc";
+        return activeFilters[filterKey];
+      })
+      .map((item) => {
+        const lat = parseFloat(item.lat);
+        const lng = parseFloat(item.lng);
+        if (isNaN(lat) || isNaN(lng)) return null;
 
-    // 필터링 실행
-    const filtered = hazards.filter((item) => {
-      // 승인된 데이터만 표시 (status가 없으면 기본 승인 처리)
-      const isApproved = !item.status || item.status === "APPROVED";
-      
-      // 매핑된 키가 없으면 자동으로 'etc' 필터를 타게 함 (기타 필터 기능)
-      const filterKey = CATEGORY_MAP[item.category] || "etc";
-      const isCategoryMatch = activeFilters[filterKey];
-
-      return isApproved && isCategoryMatch;
-    });
-
-    // 마커 생성 및 클릭 이벤트 등록
-    markersRef.current = filtered.map((item) => {
-      const lat = parseFloat(item.latitude);
-      const lng = parseFloat(item.longitude);
-      if (isNaN(lat) || isNaN(lng)) return null;
-
-      const isUserReport = !!(item.photos && item.photos.length > 0);
-
-      const marker = new window.kakao.maps.Marker({
-        position: new window.kakao.maps.LatLng(lat, lng),
-        map: map,
-        image: isUserReport ? userMarkerImage : null, 
-        zIndex: isUserReport ? 20 : 10,
-      });
-
-      window.kakao.maps.event.addListener(marker, "click", () => {
-        useMapStore.getState().setSelectedHazard({
-          ...item,
-          isUserReport, 
+        const marker = new window.kakao.maps.Marker({
+          position: new window.kakao.maps.LatLng(lat, lng),
+          map: map,
+          title: item.name,
+          clickable: true,
+          zIndex: 10,
         });
-      });
 
-      return marker;
-    }).filter(m => m !== null);
+        window.kakao.maps.event.addListener(marker, "click", () => {
+          setSelectedHazard(item);
+        });
 
-  }, [map, hazards, activeFilters, isPicking]);
+        return marker;
+      })
+      .filter((m) => m !== null);
 
-  // 3. 내 위치로 지도 이동 기능
+    markersRef.current = newMarkers;
+  }, [map, hazards, activeFilters, isPicking, setSelectedHazard]);
+
+  // 3. 내 위치 이동 (동일)
   const moveToCurrentLocation = () => {
     if (!map || !navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((p) => {
       const loc = new window.kakao.maps.LatLng(p.coords.latitude, p.coords.longitude);
       map.panTo(loc);
-      // 기존 위치 마커가 있다면 제거 후 갱신
       if (myLocationMarkerRef.current) myLocationMarkerRef.current.setMap(null);
       myLocationMarkerRef.current = new window.kakao.maps.Marker({ position: loc, map });
     });
   };
 
-  // 4. 주소 검색 후 지도 이동 기능
+  // 4. 주소 검색 이동 (동일)
   const searchAndMove = (address) => {
     if (!map || !address) return;
     const geocoder = new window.kakao.maps.services.Geocoder();

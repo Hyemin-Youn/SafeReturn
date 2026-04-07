@@ -8,20 +8,27 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      const { accessToken, user } = response.data;
-      
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('user', JSON.stringify(user));
+  // Login.jsx의 handleLogin 함수 부분 수정
+const handleLogin = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await api.post('/auth/login', { email, password });
+    const { accessToken, user } = response.data;
+    
+    // 1. 로컬 스토리지에 저장
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('user', JSON.stringify(user));
 
-      user.role === 'admin' ? navigate('/admin') : navigate('/mypage');
-    } catch (err) {
-      alert('이메일 또는 비밀번호를 확인해주세요.');
-    }
-  };
+    // 2. [수정] 무조건 지도(/map)로 보내기
+    // 만약 관리자 페이지가 따로 필요 없다면 바로 /map으로 쏘세요!
+    navigate('/map'); 
+    
+    // 페이지 강제 새로고침 (App.jsx의 isAuthenticated를 새로고침 없이 반영하기 위함)
+    window.location.reload(); 
+  } catch (err) {
+    alert('이메일 또는 비밀번호를 확인해주세요.');
+  }
+};
 
   return (
     <div style={styles.container}>
