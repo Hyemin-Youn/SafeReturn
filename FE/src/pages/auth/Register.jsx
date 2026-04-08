@@ -4,7 +4,7 @@ import api from '../../api/axiosInstance';
 
 const Register = () => {
   const [formData, setFormData] = useState({ 
-    nickname: '', // 이름 대신 닉네임을 주요 식별자로 사용
+    nickname: '', 
     email: '', 
     phone: '', 
     password: '' 
@@ -13,6 +13,22 @@ const Register = () => {
   const navigate = useNavigate();
 
   const isPasswordMatch = formData.password === confirmPassword;
+
+  // 🚩 전화번호 자동 하이픈 포맷 함수
+  const formatPhoneNumber = (value) => {
+    if (!value) return value;
+    
+    // 숫자 이외의 문자 제거
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+
+    // 길이에 따른 하이픈 위치 조절
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 8) {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+    }
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7, 11)}`;
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -39,7 +55,7 @@ const Register = () => {
     try {
       const submitData = {
         ...formData,
-        phone: formData.phone.replace(/-/g, '')
+        phone: formData.phone.replace(/-/g, '') // 서버 전송 시엔 다시 하이픈 제거
       };
       
       await api.post('/auth/register', submitData);
@@ -88,7 +104,7 @@ const Register = () => {
                 />
               </div>
 
-              {/* 휴대폰 번호 */}
+              {/* 휴대폰 번호 (하이픈 기능 적용) */}
               <div style={styles.inputGroup}>
                 <label style={styles.label}>휴대폰 번호</label>
                 <input 
@@ -96,7 +112,11 @@ const Register = () => {
                   placeholder="010-0000-0000" 
                   style={styles.input} 
                   value={formData.phone}
-                  onChange={e => setFormData({...formData, phone: e.target.value})} 
+                  maxLength={13} // 하이픈 포함 최대 길이
+                  onChange={e => {
+                    const formattedValue = formatPhoneNumber(e.target.value);
+                    setFormData({...formData, phone: formattedValue});
+                  }} 
                   required 
                 />
               </div>
